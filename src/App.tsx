@@ -1,17 +1,29 @@
 import {
+  Box,
   OrbitControls,
   PerspectiveCamera,
-  TransformControls,
+  Plane,
+  SpotLight,
+  SpotLightShadow,
+  TorusKnot,
+  useCubeTexture,
+  useDepthBuffer,
+  useHelper,
 } from '@react-three/drei'
 import { Canvas, ThreeElements, useFrame, useThree } from '@react-three/fiber'
 import { useControls } from 'leva'
-import { useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import styles from './App.module.css'
 
 import vertexShader from 'shaders/dummy.vert'
 import fragmentShader from 'shaders/dummy.frag'
 import * as THREE from 'three'
-import { ShaderMaterial } from 'three'
+import {
+  DirectionalLight,
+  DirectionalLightHelper,
+  ShaderMaterial,
+  TextureLoader,
+} from 'three'
 
 const uniforms = {
   u_time: {
@@ -19,9 +31,7 @@ const uniforms = {
   },
 }
 
-function Box(props: ThreeElements['mesh']) {
-  const ref = useRef<THREE.Mesh>(null!)
-
+function MyShaderMaterial() {
   const materialRef = useRef<ShaderMaterial>(null)
 
   useFrame((state) => {
@@ -30,45 +40,109 @@ function Box(props: ThreeElements['mesh']) {
   })
 
   return (
+    <shaderMaterial
+      ref={materialRef}
+      fragmentShader={fragmentShader}
+      vertexShader={vertexShader}
+      uniforms={uniforms}
+      glslVersion={THREE.GLSL3}
+    />
+  )
+}
+
+function BoxMesh(props: ThreeElements['mesh']) {
+  const ref = useRef<THREE.Mesh>(null!)
+
+  return (
     <mesh
+      castShadow
+      receiveShadow
       {...props}
       ref={ref}
     >
-      <boxGeometry args={[2, 2, 2]} />
-      <shaderMaterial
-        ref={materialRef}
-        fragmentShader={fragmentShader}
-        vertexShader={vertexShader}
-        uniforms={uniforms}
-        glslVersion={THREE.GLSL3}
-      />
+      <boxGeometry />
+      <meshStandardMaterial color={0xff0000} />
     </mesh>
+  )
+}
+
+function SkyBox() {
+  const { scene, camera } = useThree()
+
+  const envMap = useCubeTexture(
+    ['px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png'],
+    { path: '/assets/sky/' }
+  )
+
+  useEffect(() => {
+    scene.background = envMap
+    envMap.encoding = THREE.sRGBEncoding
+  }, [])
+
+  return null
+}
+
+function MainPlane(props: ThreeElements['mesh']) {
+  const ref = useRef<THREE.Mesh>(null!)
+
+  useEffect(() => {
+    ref.current.rotation.x = -Math.PI / 2
+  }, [])
+
+  return (
+    <mesh
+      {...props}
+      castShadow={false}
+      receiveShadow={true}
+      ref={ref}
+    >
+      <planeGeometry args={[10000, 10000, 1, 1]} />
+      <meshStandardMaterial color={0xffffff} />
+    </mesh>
+  )
+}
+
+function MyLight() {
+  const { lightTarget } = useControls({ lightTarget: { x: -5, z: 0 } })
+  const dirLightRef = useRef<DirectionalLight>(null!)
+  return (
+    <directionalLight
+      castShadow
+      position={[lightTarget.x, 5, lightTarget.z]}
+      ref={dirLightRef}
+    />
   )
 }
 
 function App() {
   const { color } = useControls('Fog', { color: '#000' })
+
   return (
     <div className={styles.App}>
-      {/* <canvas className={styles.canvas} id="mainCanvas" /> */}
-      <Canvas className={styles.canvas}>
-        <ambientLight />
-        {/* <Sky sunPosition={[100, 20, 100]} /> */}
-        <pointLight position={[0, 0, 0]} />
-        <PerspectiveCamera fov={20}></PerspectiveCamera>
+      <Canvas
+        shadows
+        className={styles.canvas}
+      >
+        <SkyBox />
+        <MyLight />
         <Box
-          scale={[2, 2, 2]}
-          position={[0, 0, 0]}
-        />
-        <OrbitControls
-          makeDefault
-          minPolarAngle={0}
-          maxPolarAngle={Math.PI / 1.75}
-        />
-        <fog
-          attach={'fog'}
-          args={[color, 2, 10]}
-        />
+          position={[0, 0, -10]}
+          scale={[15, 15, 15]}
+        >
+          <MyShaderMaterial />
+        </Box>
+
+        {/* <Plane
+          receiveShadow
+          rotation-x={-Math.PI / 2}
+          position-y={-1}
+          args={[1000, 1000]}
+        >
+          <meshStandardMaterial
+            attach="material"
+            color="white"
+          />
+        </Plane> */}
       </Canvas>
     </div>
   )
