@@ -13,7 +13,7 @@ import {
 import { Canvas, ThreeElements, useFrame, useThree } from '@react-three/fiber'
 import { useControls } from 'leva'
 import { useEffect, useMemo, useRef } from 'react'
-import styles from './App.module.css'
+import styles from 'App.module.css'
 
 import vertexShader from 'shaders/dummy.vert'
 import fragmentShader from 'shaders/dummy.frag'
@@ -24,6 +24,8 @@ import {
   ShaderMaterial,
   TextureLoader,
 } from 'three'
+
+import { Routes } from 'generouted/react-location'
 
 const uniforms = {
   u_time: {
@@ -114,38 +116,27 @@ function MyLight() {
   )
 }
 
-function App() {
+export const Action = () => console.log('Route action')
+
+export const Pending = () => <div>Route pending</div>
+export const Catch = () => <div>Route error</div>
+
+export default function Page() {
   const { color } = useControls('Fog', { color: '#000' })
 
   return (
-    <div className={styles.App}>
-      <Canvas
-        shadows
-        className={styles.canvas}
+    <Canvas
+      shadows
+      className={styles.canvas}
+    >
+      <SkyBox />
+      <MyLight />
+      <Box
+        position={[0, 0, -10]}
+        scale={[15, 15, 15]}
       >
-        <SkyBox />
-        <MyLight />
-        <Box
-          position={[0, 0, -10]}
-          scale={[15, 15, 15]}
-        >
-          <MyShaderMaterial />
-        </Box>
-
-        {/* <Plane
-          receiveShadow
-          rotation-x={-Math.PI / 2}
-          position-y={-1}
-          args={[1000, 1000]}
-        >
-          <meshStandardMaterial
-            attach="material"
-            color="white"
-          />
-        </Plane> */}
-      </Canvas>
-    </div>
+        <MyShaderMaterial />
+      </Box>
+    </Canvas>
   )
 }
-
-export default App
