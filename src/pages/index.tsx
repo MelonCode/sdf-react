@@ -1,4 +1,6 @@
+import classNames from 'classnames'
 import { Link } from 'react-router-dom'
+import utils from 'utils.module.css'
 
 export const Loader = () => console.log('Route loader')
 export const Action = () => console.log('Route action')
@@ -9,9 +11,15 @@ export const Catch = () => <div>Route error</div>
 // TODO Proper index page
 export default function Index() {
   return (
-    <div>
-      <Link to="/">Home</Link>
-      <Link to="/sdf-2d">2D Playground</Link>
+    <div className={classNames(utils.center, utils.column)}>
+      <ul>
+        <li>
+          <Link to="/">Home</Link>
+        </li>
+        <li>
+          <Link to="/sdf-2d">2D Playground</Link>
+        </li>
+      </ul>
     </div>
   )
 }
