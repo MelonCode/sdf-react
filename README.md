@@ -1,6 +1,6 @@
 # SDF Playground
 
-This is study project to learn more about ThreeJS, React Tree Fiber, Shaders and Signed Distance Function based rendering
+This is study project to learn more about ThreeJS, React Three Fiber, Shaders and Signed Distance Function based rendering
 
 ### Running on your machine
 
