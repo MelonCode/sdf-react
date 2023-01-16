@@ -22,6 +22,13 @@ const uniforms = {
   iResolution: {
     value: new THREE.Vector2(800, 600),
   },
+  circle: {
+    value: {
+      center: new THREE.Vector2(200.0, 200.0),
+      radius: 100.0,
+      color: new THREE.Vector3(1.0, 0.0, 0.0),
+    },
+  },
 }
 
 function Shader() {
@@ -29,13 +36,20 @@ function Shader() {
 
   const { viewport } = useThree()
   const { width, height } = viewport
-
+  const { position, radius, color } = useControls('Circle', {
+    color: { r: 0, b: 0, g: 255 },
+    position: { x: 1000, y: 300 },
+    radius: { min: 10, max: 500, value: 200 },
+  })
   useFrame((state) => {
     const { clock } = state
     const uniforms = materialRef.current!.uniforms
 
     uniforms.iTime.value = clock.getElapsedTime()
     uniforms.iResolution.value.set(width, height)
+    uniforms.circle.value.center.set(position.x, height - position.y)
+    uniforms.circle.value.radius = radius
+    uniforms.circle.value.color.set(color.r / 255, color.g / 255, color.b / 255)
   })
 
   return (
@@ -50,8 +64,6 @@ function Shader() {
 }
 
 export default function Page() {
-  const { color } = useControls('Fog', { color: '#000' })
-
   return (
     <Canvas
       dpr={1}
