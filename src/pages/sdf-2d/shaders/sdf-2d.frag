@@ -12,7 +12,7 @@ struct Circle {
   vec3 color;
 };
 
-uniform Circle circle;
+uniform Circle[20] circles;
 
 float singedDistanceToCircle(vec2 point, Circle circle) {
   return length(circle.center - point) - circle.radius;
@@ -20,7 +20,6 @@ float singedDistanceToCircle(vec2 point, Circle circle) {
 
 vec3 singedDistanceClr(vec2 point) {
   vec3 clr = vec3(1.0, 1.0, 1.0);
-  Circle circles[1] = Circle[](circle);
 
   for (int i = 0; i < circles.length(); i++) {
     Circle circle = circles[i];
