@@ -1,13 +1,24 @@
 import { OrthographicCamera, Plane } from '@react-three/drei'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import styles from 'App.module.css'
-import { useRef } from 'react'
+import hexRgb from 'hex-rgb'
+import { useEffect, useRef } from 'react'
 
 import * as THREE from 'three'
 import { ShaderMaterial, Vector2, Vector3 } from 'three'
 import fragmentShader from './shaders/sdf-2d.frag'
 import vertexShader from './shaders/sdf-2d.vert'
 import { useCirclesControl } from './useCirclesControl'
+
+const colors = [
+  'E2B8CF',
+  'E2C2B8',
+  'EEE8B2',
+  '8CCDA4',
+  '8CCDCD',
+  '8CA2CD',
+  '8D8CCD',
+].map((color) => hexRgb(color))
 
 const uniforms = {
   iTime: {
@@ -16,15 +27,25 @@ const uniforms = {
   iResolution: {
     value: new THREE.Vector2(800, 600),
   },
+  iMousePosition: {
+    value: new THREE.Vector2(400, 300),
+  },
   circles: {
-    value: new Array(20).fill(0).map(() => ({
-      center: new THREE.Vector2(
-        Math.random() * window.innerWidth,
-        300.0 + Math.random() * 500
-      ),
-      radius: Math.random() * 200,
-      color: new THREE.Vector3(Math.random(), Math.random(), Math.random()),
-    })),
+    value: new Array(40).fill(0).map(() => {
+      const color = colors[Math.floor(Math.random() * colors.length)]
+      return {
+        center: new THREE.Vector2(
+          Math.random() * window.innerWidth,
+          300.0 + Math.random() * 500
+        ),
+        radius: 25 + Math.random() * 50,
+        color: new THREE.Vector3(
+          color.red / 255,
+          color.green / 255,
+          color.blue / 255
+        ),
+      }
+    }),
   },
 }
 
@@ -49,6 +70,16 @@ function Shader() {
     uniforms.iResolution.value.set(width, height)
     console.log(uniforms)
   })
+
+  useEffect(() => {
+    function onMouseMove(event: MouseEvent) {
+      uniforms.iMousePosition.value.x = event.pageX
+      uniforms.iMousePosition.value.y = event.pageY
+    }
+
+    document.addEventListener('mousemove', onMouseMove)
+    return () => document.removeEventListener('mousemove', onMouseMove)
+  }, [])
 
   return (
     <shaderMaterial
