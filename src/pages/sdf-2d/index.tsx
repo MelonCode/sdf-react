@@ -8,7 +8,6 @@ import * as THREE from 'three'
 import { ShaderMaterial, Vector2, Vector3 } from 'three'
 import fragmentShader from './shaders/sdf-2d.frag'
 import vertexShader from './shaders/sdf-2d.vert'
-import { useCirclesControl } from './useCirclesControl'
 
 const colors = [
   'E2B8CF',
@@ -20,6 +19,19 @@ const colors = [
   '8D8CCD',
 ].map((color) => hexRgb(color))
 
+enum ShapeType {
+  NONE,
+  CIRCLE,
+  RECTANGLE,
+}
+
+export interface Shape {
+  center: Vector2
+  radius: number
+  color: Vector3
+  shapeType: ShapeType
+}
+
 const uniforms = {
   iTime: {
     value: 0.0,
@@ -28,31 +40,26 @@ const uniforms = {
     value: new THREE.Vector2(800, 600),
   },
   iMousePosition: {
-    value: new THREE.Vector2(400, 300),
+    value: new THREE.Vector2(400, 600),
   },
-  circles: {
-    value: new Array(40).fill(0).map(() => {
+  shapes: {
+    value: new Array(10).fill(0).map(() => {
       const color = colors[Math.floor(Math.random() * colors.length)]
       return {
         center: new THREE.Vector2(
           Math.random() * window.innerWidth,
           300.0 + Math.random() * 500
         ),
-        radius: 25 + Math.random() * 50,
+        size: 25 + Math.random() * 50,
         color: new THREE.Vector3(
           color.red / 255,
           color.green / 255,
           color.blue / 255
         ),
+        shapeType: ShapeType.CIRCLE,
       }
     }),
   },
-}
-
-export interface Circle {
-  center: Vector2
-  radius: number
-  color: Vector3
 }
 
 function Shader() {
@@ -60,7 +67,6 @@ function Shader() {
 
   const { viewport } = useThree()
   const { width, height } = viewport
-  // useCirclesControl(materialRef)
 
   useFrame((state) => {
     const { clock } = state
@@ -68,7 +74,6 @@ function Shader() {
 
     uniforms.iTime.value = clock.getElapsedTime()
     uniforms.iResolution.value.set(width, height)
-    console.log(uniforms)
   })
 
   useEffect(() => {
