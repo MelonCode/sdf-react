@@ -1,38 +1,19 @@
-import {
-  Box,
-  OrbitControls,
-  PerspectiveCamera,
-  Plane,
-  SpotLight,
-  SpotLightShadow,
-  TorusKnot,
-  useCubeTexture,
-  useDepthBuffer,
-  useHelper,
-} from '@react-three/drei'
+import { Box, useCubeTexture } from '@react-three/drei'
 import { Canvas, ThreeElements, useFrame, useThree } from '@react-three/fiber'
-import { useControls } from 'leva'
-import { useEffect, useMemo, useRef } from 'react'
 import styles from 'App.module.css'
+import { useControls } from 'leva'
+import { useEffect, useRef } from 'react'
 
+import fragmentShader from './shaders/sdf-2d.frag'
+import vertexShader from './shaders/sdf-2d.vert'
 import * as THREE from 'three'
-import {
-  DirectionalLight,
-  DirectionalLightHelper,
-  ShaderMaterial,
-  TextureLoader,
-} from 'three'
+import { DirectionalLight, ShaderMaterial } from 'three'
 
 const uniforms = {
   u_time: {
     value: 0.0,
   },
 }
-
-export const Action = () => console.log('Route action')
-
-export const Pending = () => <div>Route pending</div>
-export const Catch = () => <div>Route error</div>
 
 function MyShaderMaterial() {
   const materialRef = useRef<ShaderMaterial>(null)
@@ -45,8 +26,8 @@ function MyShaderMaterial() {
   return (
     <shaderMaterial
       ref={materialRef}
-      // fragmentShader={fragmentShader}
-      // vertexShader={vertexShader}
+      fragmentShader={fragmentShader}
+      vertexShader={vertexShader}
       uniforms={uniforms}
       glslVersion={THREE.GLSL3}
     />
@@ -114,25 +95,5 @@ function MyLight() {
       position={[lightTarget.x, 5, lightTarget.z]}
       ref={dirLightRef}
     />
-  )
-}
-
-export default function Page() {
-  const { color } = useControls('Fog', { color: '#000' })
-
-  return (
-    <Canvas
-      shadows
-      className={styles.canvas}
-    >
-      <SkyBox />
-      <MyLight />
-      <Box
-        position={[0, 0, -10]}
-        scale={[15, 15, 15]}
-      >
-        <MyShaderMaterial />
-      </Box>
-    </Canvas>
   )
 }

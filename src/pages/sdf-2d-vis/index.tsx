@@ -112,13 +112,8 @@ export default function Page() {
         bottom={-1}
         near={-1}
         far={1}
-        getObjectsByProperty={undefined}
       />
-      <Plane
-        args={[2, 2]}
-        getObjectsByProperty={undefined}
-        getVertexPosition={undefined}
-      >
+      <Plane args={[2, 2]}>
         <Shader />
       </Plane>
     </Canvas>

@@ -17,7 +17,13 @@ export default function Index() {
           <Link to="/">Home</Link>
         </li>
         <li>
+          <Link to="/sdf-2d-vis">Visualize distance field</Link>
+        </li>
+        <li>
           <Link to="/sdf-2d">2D Playground</Link>
+        </li>
+        <li>
+          <Link to="/editor">Editor</Link>
         </li>
       </ul>
     </div>
